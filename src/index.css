@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+*{box-sizing:border-box}
+body{margin:0;background:#101114;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit}
+@layer components{
+ .card{background:#181A1F;border:1px solid #242831;border-radius:18px;padding:14px}
+ .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+ .btn{width:100%;border-radius:13px;background:#4F8CFF;color:#fff;padding:12px;font-weight:700}
+ .smallbtn{border-radius:10px;background:#262932;padding:8px 10px;font-size:12px}
+ .input{width:100%;border:1px solid #30343d;background:#101114;border-radius:11px;padding:10px;outline:none}
+ .notice{border-radius:13px;background:#20252d;padding:11px;font-size:12px;color:#aab2c0}
+ .tag{display:inline-block;background:#292d35;border-radius:7px;padding:3px 6px;margin-left:4px;font-size:10px;color:#9aa3b2}
+ .tag-ok{color:#32D583;background:#163125}
+}

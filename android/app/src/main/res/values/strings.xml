@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">TECH EMPIRE</string>
+    <string name="title_activity_main">TECH EMPIRE</string>
+    <string name="package_name">com.techempire.game</string>
+    <string name="custom_url_scheme">com.techempire.game</string>
+</resources>
