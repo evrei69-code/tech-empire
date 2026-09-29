@@ -446,16 +446,23 @@ export function productDemand(s:CompanyState,kind:ProductKind,price?:number){
 }
 
 export function productCapacity(s:CompanyState,kind:ProductKind){
+ const dependencies=productFactoryDependencies(kind);
+ if(dependencies.some(factory=>factoryCount(s,factory)<1))return 0;
+
  return Math.min(
-  ...productFactoryDependencies(kind).map(
+  ...dependencies.map(
    factory=>Math.min(MAX_ECONOMIC_VALUE,5+factoryCount(s,factory)*12)
   )
  );
 }
 
+export function productProductionPerMinute(s:CompanyState,kind:ProductKind){
+ return productCapacity(s,kind);
+}
+
 export function productSalesPerMinute(s:CompanyState,kind:ProductKind,price?:number){
  const demandPerMinute=productDemand(s,kind,price);
- const capacityPerMinute=productCapacity(s,kind);
+ const capacityPerMinute=productProductionPerMinute(s,kind);
 
  return Math.min(demandPerMinute,capacityPerMinute);
 }
@@ -481,14 +488,17 @@ export function advance(s:CompanyState,seconds=1):CompanyState{
 
  const products=s.products.map(p=>{
   if(!p.enabled){
-  return {...p,revenue:0};
+   return {...p,revenue:0};
   }
 
   const price=nonNegativeNumber(p.price,productReferencePrice(p.kind));
   const demandPerMinute=productDemand(s,p.kind,price);
-  const salesPerMinute=productSalesPerMinute(s,p.kind,price);
-
-  const sales=salesPerMinute*elapsed/60;
+  const production=productProductionPerMinute(s,p.kind)*elapsed/60;
+  const inventory=Math.max(
+   0,
+   nonNegativeNumber(p.units,0)-nonNegativeNumber(p.sales,0)
+  );
+  const sales=Math.min(demandPerMinute*elapsed/60,inventory+production);
 
   const unitCost=productUnitCost(s,p.kind);
   const revenue=sales*price;
@@ -500,7 +510,7 @@ export function advance(s:CompanyState,seconds=1):CompanyState{
    ...p,
    quality:productQuality(s,p.kind),
    demand:demandPerMinute,
-   units:nonNegativeNumber(p.units,0)+sales,
+   units:nonNegativeNumber(p.units,0)+production,
    sales:nonNegativeNumber(p.sales,0)+sales,
    price,
    unitCost,

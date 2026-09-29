@@ -7,7 +7,7 @@ import {
   getProductAvailability,
   launchProduct,
   productDemand,
-  productCapacity,
+  productProductionPerMinute,
   factoryCount,
   productQuality,
   productReferencePrice,
@@ -59,7 +59,7 @@ export default function Empire({
   const referencePrice=productReferencePrice(kind);
   const price=selected?.price??referencePrice;
   const demand=productDemand(s,kind,price);
-  const capacity=productCapacity(s,kind);
+  const productionPerMinute=productProductionPerMinute(s,kind);
   const unitCost=productUnitCost(s,kind);
   const profit=price-unitCost;
 
@@ -170,7 +170,7 @@ export default function Empire({
             <Stat label="Себестоимость" value={`$${Math.round(unitCost)}`}/>
             <Stat label="Прибыль / шт." value={`$${Math.round(selected.price-unitCost)}`}/>
             <Stat label="Спрос" value={`${Math.round(demand)} шт./мин.`}/>
-            <Stat label="Мощность" value={`${Math.round(capacity)} шт./мин.`}/>
+            <Stat label="Производство" value={`${Math.round(productionPerMinute)} шт./мин.`}/>
             <Stat label="Продано всего" value={`${Math.round(selected.sales)} шт.`}/>
             <Stat
               label="Фактические продажи"
@@ -212,7 +212,7 @@ export default function Empire({
                 <b>×{factoryCount(s,factory)}</b>
               </div>
               <p className="text-[10px] text-mut mt-2">
-                +12 шт./мин. мощности для продуктов, которым нужно это направление.
+                Каждая фабрика добавляет +12 шт./мин. выпуска продуктам, которым нужно это направление.
               </p>
               <p className="text-[10px] text-mut mt-1">
                 Вклад в общую скидку на себестоимость (максимум 35%).

@@ -1,4 +1,8 @@
-import {CompanyState,productSalesPerMinute} from '../../game/state';
+import {
+ CompanyState,
+ productProductionPerMinute,
+ productSalesPerMinute
+} from '../../game/state';
 
 export default function Company({
  s,
@@ -10,6 +14,16 @@ export default function Company({
 }){
  const net=s.revenue-s.expenses;
  const activeProducts=s.products.filter(p=>p.enabled);
+ const productionPerSecond=activeProducts.reduce(
+  (total,p)=>total+productProductionPerMinute(s,p.kind)/60,
+  0
+ );
+ const salesPerSecond=activeProducts.reduce(
+  (total,p)=>total+productSalesPerMinute(s,p.kind,p.price)/60,
+  0
+ );
+ const producedTotal=s.products.reduce((total,p)=>total+p.units,0);
+ const soldTotal=s.products.reduce((total,p)=>total+p.sales,0);
 
  return (
   <div className="space-y-3">
@@ -26,6 +40,10 @@ export default function Company({
      <Stat label="Расходы/сек" v={money(s.expenses)}/>
      <Stat label="Чистая прибыль/сек" v={money(net)} positive={net>=0}/>
      <Stat label="Репутация" v={`${Math.round(s.reputation)}`}/>
+     <Stat label="Производство/сек" v={`${rate(productionPerSecond)} шт.`}/>
+     <Stat label="Продажи/сек" v={`${rate(salesPerSecond)} шт.`}/>
+     <Stat label="Произведено всего" v={`${quantity(producedTotal)} шт.`}/>
+     <Stat label="Продано всего" v={`${quantity(soldTotal)} шт.`}/>
     </div>
    </section>
 
@@ -43,8 +61,16 @@ export default function Company({
          <div className="grid grid-cols-2 gap-2 mt-3 text-sm">
           <ProductStat label="Цена" value={money(p.price)}/>
           <ProductStat
-           label="Продажи/мин"
-           value={`${quantity(productSalesPerMinute(s,p.kind,p.price))} шт.`}
+            label="Производство/сек"
+            value={`${rate(productProductionPerMinute(s,p.kind)/60)} шт.`}
+           />
+           <ProductStat
+            label="Продажи/сек"
+            value={`${rate(productSalesPerMinute(s,p.kind,p.price)/60)} шт.`}
+           />
+           <ProductStat
+            label="Продажи/мин"
+            value={`${quantity(productSalesPerMinute(s,p.kind,p.price))} шт.`}
           />
           <ProductStat label="Продано всего" value={`${quantity(p.sales)} шт.`}/>
           <ProductStat label="Доход/сек" value={`${money(p.revenue)}/с`}/>
@@ -103,6 +129,10 @@ function money(value:number){
 
 function quantity(value:number){
  return Math.round(value).toLocaleString('ru-RU');
+}
+
+function rate(value:number){
+ return value.toLocaleString('ru-RU',{minimumFractionDigits:1,maximumFractionDigits:1});
 }
 
 export function icon(k:string){
